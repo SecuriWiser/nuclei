@@ -8,11 +8,11 @@ import (
 
 	"github.com/andygrunwald/go-jira"
 
+	"github.com/SecuriWiser/nuclei/v2/pkg/catalog/config"
+	"github.com/SecuriWiser/nuclei/v2/pkg/output"
+	"github.com/SecuriWiser/nuclei/v2/pkg/reporting/format"
+	"github.com/SecuriWiser/nuclei/v2/pkg/types"
 	"github.com/projectdiscovery/gologger"
-	"github.com/projectdiscovery/nuclei/v2/pkg/catalog/config"
-	"github.com/projectdiscovery/nuclei/v2/pkg/output"
-	"github.com/projectdiscovery/nuclei/v2/pkg/reporting/format"
-	"github.com/projectdiscovery/nuclei/v2/pkg/types"
 	"github.com/projectdiscovery/retryablehttp-go"
 )
 

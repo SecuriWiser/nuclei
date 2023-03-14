@@ -7,8 +7,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/projectdiscovery/nuclei/v2/pkg/catalog/config"
-	"github.com/projectdiscovery/nuclei/v2/pkg/types"
+	"github.com/SecuriWiser/nuclei/v2/pkg/catalog/config"
+	"github.com/SecuriWiser/nuclei/v2/pkg/types"
 	fileutil "github.com/projectdiscovery/utils/file"
 )
 

@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/SecuriWiser/nuclei/v2/pkg/testutils"
 	"github.com/projectdiscovery/gologger"
-	"github.com/projectdiscovery/nuclei/v2/pkg/testutils"
 	"github.com/stretchr/testify/require"
 )
 

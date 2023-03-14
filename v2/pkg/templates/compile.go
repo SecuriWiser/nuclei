@@ -8,12 +8,12 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
-	"github.com/projectdiscovery/nuclei/v2/pkg/operators"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/executer"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/offlinehttp"
-	"github.com/projectdiscovery/nuclei/v2/pkg/templates/cache"
-	"github.com/projectdiscovery/nuclei/v2/pkg/utils"
+	"github.com/SecuriWiser/nuclei/v2/pkg/operators"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/executer"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/offlinehttp"
+	"github.com/SecuriWiser/nuclei/v2/pkg/templates/cache"
+	"github.com/SecuriWiser/nuclei/v2/pkg/utils"
 	"github.com/projectdiscovery/retryablehttp-go"
 	stringsutil "github.com/projectdiscovery/utils/strings"
 )
@@ -142,7 +142,7 @@ func (template *Template) compileProtocolRequests(options protocols.ExecuterOpti
 	if len(template.RequestsWHOIS) > 0 {
 		requests = append(requests, template.convertRequestToProtocolsRequest(template.RequestsWHOIS)...)
 	}
-	template.Executer = executer.NewExecuter(requests, &options)
+	template.Executer = executer.NewExecuter(requests, &options, options.Options.RiskID)
 	return nil
 }
 
@@ -187,7 +187,7 @@ mainLoop:
 	}
 	if len(operatorsList) > 0 {
 		options.Operators = operatorsList
-		template.Executer = executer.NewExecuter([]protocols.Request{&offlinehttp.Request{}}, &options)
+		template.Executer = executer.NewExecuter([]protocols.Request{&offlinehttp.Request{}}, &options, "compileOfflineHTTPRequest")
 		return nil
 	}
 

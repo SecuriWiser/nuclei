@@ -6,10 +6,10 @@ import (
 
 	"github.com/remeh/sizedwaitgroup"
 
-	"github.com/projectdiscovery/nuclei/v2/pkg/output"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/contextargs"
-	"github.com/projectdiscovery/nuclei/v2/pkg/templates"
-	"github.com/projectdiscovery/nuclei/v2/pkg/templates/types"
+	"github.com/SecuriWiser/nuclei/v2/pkg/output"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/contextargs"
+	"github.com/SecuriWiser/nuclei/v2/pkg/templates"
+	"github.com/SecuriWiser/nuclei/v2/pkg/templates/types"
 	stringsutil "github.com/projectdiscovery/utils/strings"
 )
 
@@ -35,7 +35,7 @@ func (e *Engine) ExecuteScanWithOpts(templatesList []*templates.Template, target
 
 	var finalTemplates []*templates.Template
 	if !noCluster {
-		finalTemplates, _ = templates.ClusterTemplates(templatesList, e.executerOpts)
+		finalTemplates, _ = templates.ClusterTemplates(templatesList, e.executerOpts, e.executerOpts.Options.RiskID)
 	} else {
 		finalTemplates = templatesList
 	}

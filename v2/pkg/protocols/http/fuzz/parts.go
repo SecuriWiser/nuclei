@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/expressions"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/generators"
 	"github.com/corpix/uarand"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/expressions"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/generators"
 	"github.com/projectdiscovery/retryablehttp-go"
 	urlutil "github.com/projectdiscovery/utils/url"
 )

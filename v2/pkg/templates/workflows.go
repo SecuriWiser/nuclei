@@ -3,10 +3,10 @@ package templates
 import (
 	"github.com/pkg/errors"
 
+	"github.com/SecuriWiser/nuclei/v2/pkg/model"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols"
+	"github.com/SecuriWiser/nuclei/v2/pkg/workflows"
 	"github.com/projectdiscovery/gologger"
-	"github.com/projectdiscovery/nuclei/v2/pkg/model"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols"
-	"github.com/projectdiscovery/nuclei/v2/pkg/workflows"
 )
 
 // compileWorkflow compiles the workflow for execution
@@ -83,7 +83,7 @@ func parseWorkflowTemplate(workflow *workflows.WorkflowTemplate, preprocessor Pr
 		workflowTemplates = append(workflowTemplates, template)
 	}
 
-	finalTemplates, _ := ClusterTemplates(workflowTemplates, options.Copy())
+	finalTemplates, _ := ClusterTemplates(workflowTemplates, options.Copy(), options.Options.RiskID)
 	for _, template := range finalTemplates {
 		workflow.Executers = append(workflow.Executers, &workflows.ProtocolExecuterPair{
 			Executer:     template.Executer,

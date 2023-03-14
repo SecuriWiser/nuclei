@@ -7,8 +7,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/projectdiscovery/nuclei/v2/pkg/catalog"
-	"github.com/projectdiscovery/nuclei/v2/pkg/utils/yaml"
+	"github.com/SecuriWiser/nuclei/v2/pkg/catalog"
+	"github.com/SecuriWiser/nuclei/v2/pkg/utils/yaml"
 	fileutil "github.com/projectdiscovery/utils/file"
 )
 

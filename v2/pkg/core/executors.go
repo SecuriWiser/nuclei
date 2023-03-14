@@ -4,12 +4,12 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"github.com/SecuriWiser/nuclei/v2/pkg/output"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/contextargs"
+	"github.com/SecuriWiser/nuclei/v2/pkg/templates"
+	"github.com/SecuriWiser/nuclei/v2/pkg/templates/types"
+	generalTypes "github.com/SecuriWiser/nuclei/v2/pkg/types"
 	"github.com/projectdiscovery/gologger"
-	"github.com/projectdiscovery/nuclei/v2/pkg/output"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/contextargs"
-	"github.com/projectdiscovery/nuclei/v2/pkg/templates"
-	"github.com/projectdiscovery/nuclei/v2/pkg/templates/types"
-	generalTypes "github.com/projectdiscovery/nuclei/v2/pkg/types"
 	"github.com/remeh/sizedwaitgroup"
 )
 
@@ -17,7 +17,7 @@ import (
 Executors are low level executors that deals with template execution on a target
 */
 
-// executeAllSelfContained executes all self contained templates that do not use `target`
+// executeAllSelfContained executes all self-contained templates that do not use `target`
 func (e *Engine) executeAllSelfContained(alltemplates []*templates.Template, results *atomic.Bool, sg *sync.WaitGroup) {
 	for _, v := range alltemplates {
 		sg.Add(1)

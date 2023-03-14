@@ -2,30 +2,40 @@ package output
 
 import (
 	"bytes"
+	"context"
+	"github.com/SecuriWiser/nuclei/v2/internal/firebase"
+	"github.com/projectdiscovery/gologger"
 	"strconv"
+	"strings"
 
-	"github.com/projectdiscovery/nuclei/v2/pkg/types"
+	"github.com/SecuriWiser/nuclei/v2/pkg/types"
 )
 
 // formatScreen formats the output for showing on screen.
-func (w *StandardWriter) formatScreen(output *ResultEvent) []byte {
+func (w *StandardWriter) formatScreen(output *ResultEvent, riskID string) []byte {
 	builder := &bytes.Buffer{}
+	riskData := make(map[string]any)
 
 	if !w.noMetadata {
 		if w.timestamp {
+			timestamp := output.Timestamp.Format("2006-01-02 15:04:05")
 			builder.WriteRune('[')
-			builder.WriteString(w.aurora.Cyan(output.Timestamp.Format("2006-01-02 15:04:05")).String())
+			builder.WriteString(w.aurora.Cyan(timestamp).String())
 			builder.WriteString("] ")
+			riskData["timestamp"] = timestamp
 		}
 		builder.WriteRune('[')
 		builder.WriteString(w.aurora.BrightGreen(output.TemplateID).String())
+		riskData["templateID"] = output.TemplateID
 
 		if output.MatcherName != "" {
 			builder.WriteString(":")
 			builder.WriteString(w.aurora.BrightGreen(output.MatcherName).Bold().String())
+			riskData["matcherName"] = output.MatcherName
 		} else if output.ExtractorName != "" {
 			builder.WriteString(":")
 			builder.WriteString(w.aurora.BrightGreen(output.ExtractorName).Bold().String())
+			riskData["extractorName"] = output.ExtractorName
 		}
 
 		if w.matcherStatus {
@@ -40,15 +50,19 @@ func (w *StandardWriter) formatScreen(output *ResultEvent) []byte {
 		builder.WriteString("] [")
 		builder.WriteString(w.aurora.BrightBlue(output.Type).String())
 		builder.WriteString("] ")
+		riskData["type"] = output.Type
 
 		builder.WriteString("[")
 		builder.WriteString(w.severityColors(output.Info.SeverityHolder.Severity))
 		builder.WriteString("] ")
+		riskData["severity"] = output.Info.SeverityHolder.Severity
 	}
 	if output.Matched != "" {
 		builder.WriteString(output.Matched)
+		riskData["matchedHost"] = output.Matched
 	} else {
 		builder.WriteString(output.Host)
+		riskData["matchedHost"] = output.Host
 	}
 
 	// If any extractors, write the results
@@ -63,6 +77,7 @@ func (w *StandardWriter) formatScreen(output *ResultEvent) []byte {
 			}
 		}
 		builder.WriteString("]")
+		riskData["extractedResults"] = strings.Join(output.ExtractedResults, ",")
 	}
 
 	if len(output.Lines) > 0 {
@@ -95,5 +110,17 @@ func (w *StandardWriter) formatScreen(output *ResultEvent) []byte {
 		}
 		builder.WriteString("]")
 	}
+	riskData["metadata"] = output.Metadata
+
+	builder.WriteString(" [")
+	builder.WriteString(strings.Replace(output.Info.Description, "\n", "", 1))
+	builder.WriteRune(']')
+	riskData["description"] = output.Info.Description
+
+	_, _, err := firebase.Client.Collection("scanning_dev").Doc("risk-profiles").Collection(riskID).Add(context.Background(), riskData)
+	if err != nil {
+		gologger.Error().Msgf("Add data for %s to firebase error %s\n", riskID, err.Error())
+	}
+
 	return builder.Bytes()
 }

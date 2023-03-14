@@ -15,14 +15,14 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"github.com/logrusorgru/aurora"
 
+	"github.com/SecuriWiser/nuclei/v2/internal/colorizer"
+	"github.com/SecuriWiser/nuclei/v2/pkg/model"
+	"github.com/SecuriWiser/nuclei/v2/pkg/model/types/severity"
+	"github.com/SecuriWiser/nuclei/v2/pkg/operators"
+	"github.com/SecuriWiser/nuclei/v2/pkg/types"
+	"github.com/SecuriWiser/nuclei/v2/pkg/utils"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/interactsh/pkg/server"
-	"github.com/projectdiscovery/nuclei/v2/internal/colorizer"
-	"github.com/projectdiscovery/nuclei/v2/pkg/model"
-	"github.com/projectdiscovery/nuclei/v2/pkg/model/types/severity"
-	"github.com/projectdiscovery/nuclei/v2/pkg/operators"
-	"github.com/projectdiscovery/nuclei/v2/pkg/types"
-	"github.com/projectdiscovery/nuclei/v2/pkg/utils"
 	fileutil "github.com/projectdiscovery/utils/file"
 )
 
@@ -33,7 +33,7 @@ type Writer interface {
 	// Colorizer returns the colorizer instance for writer
 	Colorizer() aurora.Aurora
 	// Write writes the event to file and/or screen.
-	Write(*ResultEvent) error
+	Write(*ResultEvent, string) error
 	// WriteFailure writes the optional failure event for template to file and/or screen.
 	WriteFailure(event InternalEvent) error
 	// Request logs a request in the trace log
@@ -179,7 +179,7 @@ func NewStandardWriter(options *types.Options) (*StandardWriter, error) {
 }
 
 // Write writes the event to file and/or screen.
-func (w *StandardWriter) Write(event *ResultEvent) error {
+func (w *StandardWriter) Write(event *ResultEvent, riskID string) error {
 	// Enrich the result event with extra metadata on the template-path and url.
 	if event.TemplatePath != "" {
 		event.Template, event.TemplateURL = utils.TemplatePathURL(types.ToString(event.TemplatePath))
@@ -192,7 +192,7 @@ func (w *StandardWriter) Write(event *ResultEvent) error {
 	if w.json {
 		data, err = w.formatJSON(event)
 	} else {
-		data = w.formatScreen(event)
+		data = w.formatScreen(event, riskID)
 	}
 	if err != nil {
 		return errors.Wrap(err, "could not format output")
@@ -294,7 +294,7 @@ func (w *StandardWriter) WriteFailure(event InternalEvent) error {
 		MatcherStatus: false,
 		Timestamp:     time.Now(),
 	}
-	return w.Write(data)
+	return w.Write(data, "")
 }
 func sanitizeFileName(fileName string) string {
 	fileName = strings.ReplaceAll(fileName, "http:", "")

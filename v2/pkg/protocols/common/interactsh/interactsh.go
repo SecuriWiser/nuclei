@@ -15,15 +15,15 @@ import (
 	"github.com/karlseguin/ccache"
 	"github.com/pkg/errors"
 
+	"github.com/SecuriWiser/nuclei/v2/pkg/operators"
+	"github.com/SecuriWiser/nuclei/v2/pkg/output"
+	"github.com/SecuriWiser/nuclei/v2/pkg/progress"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/helpers/responsehighlighter"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/helpers/writer"
+	"github.com/SecuriWiser/nuclei/v2/pkg/reporting"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/interactsh/pkg/client"
 	"github.com/projectdiscovery/interactsh/pkg/server"
-	"github.com/projectdiscovery/nuclei/v2/pkg/operators"
-	"github.com/projectdiscovery/nuclei/v2/pkg/output"
-	"github.com/projectdiscovery/nuclei/v2/pkg/progress"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/helpers/responsehighlighter"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/helpers/writer"
-	"github.com/projectdiscovery/nuclei/v2/pkg/reporting"
 	"github.com/projectdiscovery/retryablehttp-go"
 )
 
@@ -52,6 +52,8 @@ type Client struct {
 	firstTimeGroup sync.Once
 	generated      uint32 // decide to wait if we have a generated url
 	matched        bool
+
+	riskID string
 }
 
 var (
@@ -100,6 +102,7 @@ type Options struct {
 
 	StopAtFirstMatch bool
 	HTTPClient       *retryablehttp.Client
+	RiskID           string
 }
 
 const defaultMaxInteractionsCount = 5000
@@ -127,6 +130,7 @@ func New(options *Options) (*Client, error) {
 		pollDuration:     options.PollDuration,
 		cooldownDuration: options.CooldownPeriod,
 		dataMutex:        &sync.RWMutex{},
+		riskID:           options.RiskID,
 	}
 	return interactClient, nil
 }
@@ -229,7 +233,7 @@ func (c *Client) processInteractionForRequest(interaction *server.Interaction, d
 		c.debugPrintInteraction(interaction, data.Event.OperatorsResult)
 	}
 
-	if writer.WriteResult(data.Event, c.options.Output, c.options.Progress, c.options.IssuesClient) {
+	if writer.WriteResult(data.Event, c.options.Output, c.options.Progress, c.options.IssuesClient, c.riskID) {
 		c.matched = true
 		if _, ok := data.Event.InternalEvent[stopAtFirstMatchAttribute]; ok || c.options.StopAtFirstMatch {
 			c.matchedTemplates.Set(hash(data.Event.InternalEvent[templateIdAttribute].(string), data.Event.InternalEvent["host"].(string)), true, defaultInteractionDuration)

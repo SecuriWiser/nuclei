@@ -7,25 +7,26 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/SecuriWiser/nuclei/v2/pkg/operators/common/dsl"
+	"github.com/SecuriWiser/nuclei/v2/pkg/output"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/contextargs"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/helpers/writer"
 	"github.com/projectdiscovery/gologger"
-	"github.com/projectdiscovery/nuclei/v2/pkg/operators/common/dsl"
-	"github.com/projectdiscovery/nuclei/v2/pkg/output"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/contextargs"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/helpers/writer"
 )
 
 // Executer executes a group of requests for a protocol
 type Executer struct {
 	requests []protocols.Request
 	options  *protocols.ExecuterOptions
+	riskID   string
 }
 
 var _ protocols.Executer = &Executer{}
 
 // NewExecuter creates a new request executer for list of requests
-func NewExecuter(requests []protocols.Request, options *protocols.ExecuterOptions) *Executer {
-	return &Executer{requests: requests, options: options}
+func NewExecuter(requests []protocols.Request, options *protocols.ExecuterOptions, riskID string) *Executer {
+	return &Executer{requests: requests, options: options, riskID: riskID}
 }
 
 // Compile compiles the execution generators preparing any requests possible.
@@ -98,7 +99,7 @@ func (e *Executer) Execute(input *contextargs.Context) (bool, error) {
 					gologger.Warning().Msgf("Could not write failure event to output: %s\n", err)
 				}
 			} else {
-				if writer.WriteResult(event, e.options.Output, e.options.Progress, e.options.IssuesClient) {
+				if writer.WriteResult(event, e.options.Output, e.options.Progress, e.options.IssuesClient, e.riskID) {
 					results.CompareAndSwap(false, true)
 				} else {
 					if err := e.options.Output.WriteFailure(event.InternalEvent); err != nil {

@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/projectdiscovery/nuclei/v2/pkg/types"
+	"github.com/SecuriWiser/nuclei/v2/pkg/types"
 )
 
 // CleanStructFieldJSONTag cleans struct json tag field

@@ -11,15 +11,15 @@ import (
 
 	"github.com/go-playground/validator/v10"
 
+	"github.com/SecuriWiser/nuclei/v2/pkg/catalog/config"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/protocolinit"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/utils/vardump"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/headless/engine"
+	"github.com/SecuriWiser/nuclei/v2/pkg/types"
 	"github.com/projectdiscovery/goflags"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/gologger/formatter"
 	"github.com/projectdiscovery/gologger/levels"
-	"github.com/projectdiscovery/nuclei/v2/pkg/catalog/config"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/protocolinit"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/utils/vardump"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/headless/engine"
-	"github.com/projectdiscovery/nuclei/v2/pkg/types"
 	"github.com/projectdiscovery/stringsutil"
 	fileutil "github.com/projectdiscovery/utils/file"
 	logutil "github.com/projectdiscovery/utils/log"
@@ -46,7 +46,7 @@ func ParseOptions(options *types.Options) {
 	// Read the inputs and configure the logging
 	configureOutput(options)
 	// Show the user the banner
-	showBanner()
+	//showBanner()
 
 	if options.TemplatesDirectory != "" && !filepath.IsAbs(options.TemplatesDirectory) {
 		cwd, _ := os.Getwd()

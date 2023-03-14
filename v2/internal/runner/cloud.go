@@ -9,12 +9,12 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/SecuriWiser/nuclei/v2/internal/runner/nucleicloud"
+	"github.com/SecuriWiser/nuclei/v2/pkg/output"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/olekukonko/tablewriter"
 	"github.com/pkg/errors"
 	"github.com/projectdiscovery/gologger"
-	"github.com/projectdiscovery/nuclei/v2/internal/runner/nucleicloud"
-	"github.com/projectdiscovery/nuclei/v2/pkg/output"
 )
 
 // Get all the scan lists for a user/apikey.
@@ -189,7 +189,7 @@ func (r *Runner) deleteScan(id string) error {
 func (r *Runner) getResults(id string, limit int) error {
 	ID, _ := strconv.ParseInt(id, 10, 64)
 	err := r.cloudClient.GetResults(ID, false, limit, func(re *output.ResultEvent) {
-		if outputErr := r.output.Write(re); outputErr != nil {
+		if outputErr := r.output.Write(re, r.options.RiskID); outputErr != nil {
 			gologger.Warning().Msgf("Could not write output: %s", outputErr)
 		}
 	})

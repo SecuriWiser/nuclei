@@ -14,16 +14,16 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/SecuriWiser/nuclei/v2/internal/runner/nucleicloud"
+	"github.com/SecuriWiser/nuclei/v2/pkg/catalog/loader"
+	"github.com/SecuriWiser/nuclei/v2/pkg/core"
+	"github.com/SecuriWiser/nuclei/v2/pkg/output"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/contextargs"
+	"github.com/SecuriWiser/nuclei/v2/pkg/types"
 	"github.com/klauspost/compress/zlib"
 	"github.com/pkg/errors"
 	"github.com/projectdiscovery/gologger"
-	"github.com/projectdiscovery/nuclei/v2/internal/runner/nucleicloud"
-	"github.com/projectdiscovery/nuclei/v2/pkg/catalog/loader"
-	"github.com/projectdiscovery/nuclei/v2/pkg/core"
-	"github.com/projectdiscovery/nuclei/v2/pkg/output"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/contextargs"
-	"github.com/projectdiscovery/nuclei/v2/pkg/types"
 )
 
 // runStandardEnumeration runs standard enumeration
@@ -117,7 +117,7 @@ func (r *Runner) runCloudEnumeration(store *loader.Store, cloudTemplates, cloudT
 		results.CompareAndSwap(false, true)
 		_ = count.Add(1)
 
-		if outputErr := r.output.Write(re); outputErr != nil {
+		if outputErr := r.output.Write(re, r.options.RiskID); outputErr != nil {
 			gologger.Warning().Msgf("Could not write output: %s", err)
 		}
 		if r.issuesClient != nil {

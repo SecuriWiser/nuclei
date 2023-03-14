@@ -17,45 +17,45 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/projectdiscovery/nuclei/v2/internal/runner/nucleicloud"
+	"github.com/SecuriWiser/nuclei/v2/internal/runner/nucleicloud"
 
 	"github.com/blang/semver"
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/errors"
 	"github.com/projectdiscovery/ratelimit"
 
+	"github.com/SecuriWiser/nuclei/v2/internal/colorizer"
+	"github.com/SecuriWiser/nuclei/v2/pkg/catalog"
+	"github.com/SecuriWiser/nuclei/v2/pkg/catalog/config"
+	"github.com/SecuriWiser/nuclei/v2/pkg/catalog/disk"
+	"github.com/SecuriWiser/nuclei/v2/pkg/catalog/loader"
+	"github.com/SecuriWiser/nuclei/v2/pkg/core"
+	"github.com/SecuriWiser/nuclei/v2/pkg/core/inputs/hybrid"
+	"github.com/SecuriWiser/nuclei/v2/pkg/external/customtemplates"
+	"github.com/SecuriWiser/nuclei/v2/pkg/input"
+	"github.com/SecuriWiser/nuclei/v2/pkg/output"
+	"github.com/SecuriWiser/nuclei/v2/pkg/parsers"
+	"github.com/SecuriWiser/nuclei/v2/pkg/progress"
+	"github.com/SecuriWiser/nuclei/v2/pkg/projectfile"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/automaticscan"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/contextargs"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/hosterrorscache"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/interactsh"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/protocolinit"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/uncover"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/utils/excludematchers"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/headless/engine"
+	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/http/httpclientpool"
+	"github.com/SecuriWiser/nuclei/v2/pkg/reporting"
+	"github.com/SecuriWiser/nuclei/v2/pkg/reporting/exporters/markdown"
+	"github.com/SecuriWiser/nuclei/v2/pkg/reporting/exporters/sarif"
+	"github.com/SecuriWiser/nuclei/v2/pkg/templates"
+	"github.com/SecuriWiser/nuclei/v2/pkg/types"
+	"github.com/SecuriWiser/nuclei/v2/pkg/utils"
+	"github.com/SecuriWiser/nuclei/v2/pkg/utils/stats"
+	"github.com/SecuriWiser/nuclei/v2/pkg/utils/yaml"
 	"github.com/projectdiscovery/gologger"
-	"github.com/projectdiscovery/nuclei/v2/internal/colorizer"
-	"github.com/projectdiscovery/nuclei/v2/pkg/catalog"
-	"github.com/projectdiscovery/nuclei/v2/pkg/catalog/config"
-	"github.com/projectdiscovery/nuclei/v2/pkg/catalog/disk"
-	"github.com/projectdiscovery/nuclei/v2/pkg/catalog/loader"
-	"github.com/projectdiscovery/nuclei/v2/pkg/core"
-	"github.com/projectdiscovery/nuclei/v2/pkg/core/inputs/hybrid"
-	"github.com/projectdiscovery/nuclei/v2/pkg/external/customtemplates"
-	"github.com/projectdiscovery/nuclei/v2/pkg/input"
-	"github.com/projectdiscovery/nuclei/v2/pkg/output"
-	"github.com/projectdiscovery/nuclei/v2/pkg/parsers"
-	"github.com/projectdiscovery/nuclei/v2/pkg/progress"
-	"github.com/projectdiscovery/nuclei/v2/pkg/projectfile"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/automaticscan"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/contextargs"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/hosterrorscache"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/interactsh"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/protocolinit"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/uncover"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/utils/excludematchers"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/headless/engine"
-	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/http/httpclientpool"
-	"github.com/projectdiscovery/nuclei/v2/pkg/reporting"
-	"github.com/projectdiscovery/nuclei/v2/pkg/reporting/exporters/markdown"
-	"github.com/projectdiscovery/nuclei/v2/pkg/reporting/exporters/sarif"
-	"github.com/projectdiscovery/nuclei/v2/pkg/templates"
-	"github.com/projectdiscovery/nuclei/v2/pkg/types"
-	"github.com/projectdiscovery/nuclei/v2/pkg/utils"
-	"github.com/projectdiscovery/nuclei/v2/pkg/utils/stats"
-	"github.com/projectdiscovery/nuclei/v2/pkg/utils/yaml"
 	"github.com/projectdiscovery/retryablehttp-go"
 	stringsutil "github.com/projectdiscovery/utils/strings"
 )
@@ -279,6 +279,7 @@ func New(options *types.Options) (*Runner, error) {
 	if httpclient != nil {
 		opts.HTTPClient = httpclient
 	}
+	opts.RiskID = options.RiskID
 	interactshClient, err := interactsh.New(opts)
 	if err != nil {
 		gologger.Error().Msgf("Could not create interactsh client: %s", err)
@@ -480,7 +481,7 @@ func (r *Runner) RunEnumeration() error {
 		r.listAvailableStoreTemplates(store)
 		os.Exit(0)
 	}
-	r.displayExecutionInfo(store)
+	//r.displayExecutionInfo(store)
 
 	// If not explicitly disabled, check if http based protocols
 	// are used and if inputs are non-http to pre-perform probing
@@ -631,7 +632,7 @@ func (r *Runner) executeTemplatesInput(store *loader.Store, engine *core.Engine)
 	// Cluster the templates first because we want info on how many
 	// templates did we cluster for showing to user in CLI
 	originalTemplatesCount := len(store.Templates())
-	finalTemplates, clusterCount := templates.ClusterTemplates(store.Templates(), engine.ExecuterOptions())
+	finalTemplates, clusterCount := templates.ClusterTemplates(store.Templates(), engine.ExecuterOptions(), r.options.RiskID)
 	finalTemplates = append(finalTemplates, store.Workflows()...)
 
 	var totalRequests int64

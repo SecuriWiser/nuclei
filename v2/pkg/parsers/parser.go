@@ -5,12 +5,12 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/projectdiscovery/nuclei/v2/pkg/catalog"
-	"github.com/projectdiscovery/nuclei/v2/pkg/catalog/loader/filter"
-	"github.com/projectdiscovery/nuclei/v2/pkg/templates"
-	"github.com/projectdiscovery/nuclei/v2/pkg/templates/cache"
-	"github.com/projectdiscovery/nuclei/v2/pkg/utils"
-	"github.com/projectdiscovery/nuclei/v2/pkg/utils/stats"
+	"github.com/SecuriWiser/nuclei/v2/pkg/catalog"
+	"github.com/SecuriWiser/nuclei/v2/pkg/catalog/loader/filter"
+	"github.com/SecuriWiser/nuclei/v2/pkg/templates"
+	"github.com/SecuriWiser/nuclei/v2/pkg/templates/cache"
+	"github.com/SecuriWiser/nuclei/v2/pkg/utils"
+	"github.com/SecuriWiser/nuclei/v2/pkg/utils/stats"
 	"gopkg.in/yaml.v2"
 )
 
