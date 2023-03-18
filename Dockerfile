@@ -1,10 +1,16 @@
-FROM golang:1.20.0-alpine as build-env
+# Build
+FROM golang:1.20.1-alpine AS build-env
 RUN apk add build-base
 WORKDIR /app
-COPY . .
-RUN cd v2/cmd/nuclei/ && go build -o /app/nuclei main.go
+COPY . /app
+WORKDIR /app/v2
+RUN go mod download
+RUN go build ./cmd/nuclei
 
-FROM alpine:3.17.1
-RUN apk add --no-cache bind-tools ca-certificates chromium
-COPY --from=build-env /app/nuclei /usr/local/bin/nuclei
+# Release
+FROM alpine:3.17.2
+RUN apk -U upgrade --no-cache \
+    && apk add --no-cache bind-tools chromium ca-certificates
+COPY --from=build-env /app/v2/nuclei /usr/local/bin/
+
 ENTRYPOINT ["nuclei"]
