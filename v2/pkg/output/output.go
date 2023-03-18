@@ -15,14 +15,14 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"github.com/logrusorgru/aurora"
 
-	"github.com/SecuriWiser/nuclei/v2/internal/colorizer"
-	"github.com/SecuriWiser/nuclei/v2/pkg/model"
-	"github.com/SecuriWiser/nuclei/v2/pkg/model/types/severity"
-	"github.com/SecuriWiser/nuclei/v2/pkg/operators"
-	"github.com/SecuriWiser/nuclei/v2/pkg/types"
-	"github.com/SecuriWiser/nuclei/v2/pkg/utils"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/interactsh/pkg/server"
+	"github.com/projectdiscovery/nuclei/v2/internal/colorizer"
+	"github.com/projectdiscovery/nuclei/v2/pkg/model"
+	"github.com/projectdiscovery/nuclei/v2/pkg/model/types/severity"
+	"github.com/projectdiscovery/nuclei/v2/pkg/operators"
+	"github.com/projectdiscovery/nuclei/v2/pkg/types"
+	"github.com/projectdiscovery/nuclei/v2/pkg/utils"
 	fileutil "github.com/projectdiscovery/utils/file"
 )
 

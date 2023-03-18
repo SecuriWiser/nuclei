@@ -8,7 +8,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 
-	"github.com/SecuriWiser/nuclei/v2/pkg/testutils"
+	"github.com/projectdiscovery/nuclei/v2/pkg/testutils"
 )
 
 var workflowTestcases = map[string]testutils.TestCase{

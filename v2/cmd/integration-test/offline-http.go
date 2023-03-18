@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/SecuriWiser/nuclei/v2/pkg/testutils"
+	"github.com/projectdiscovery/nuclei/v2/pkg/testutils"
 )
 
 var offlineHttpTestcases = map[string]testutils.TestCase{

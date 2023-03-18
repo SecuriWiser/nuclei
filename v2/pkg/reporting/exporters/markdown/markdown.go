@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/SecuriWiser/nuclei/v2/pkg/output"
-	"github.com/SecuriWiser/nuclei/v2/pkg/reporting/format"
+	"github.com/projectdiscovery/nuclei/v2/pkg/output"
+	"github.com/projectdiscovery/nuclei/v2/pkg/reporting/format"
 	stringsutil "github.com/projectdiscovery/utils/strings"
 )
 

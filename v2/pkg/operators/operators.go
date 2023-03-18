@@ -7,10 +7,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/SecuriWiser/nuclei/v2/pkg/operators/extractors"
-	"github.com/SecuriWiser/nuclei/v2/pkg/operators/matchers"
-	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/generators"
-	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/utils/excludematchers"
+	"github.com/projectdiscovery/nuclei/v2/pkg/operators/extractors"
+	"github.com/projectdiscovery/nuclei/v2/pkg/operators/matchers"
+	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/generators"
+	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/utils/excludematchers"
 	sliceutil "github.com/projectdiscovery/utils/slice"
 )
 

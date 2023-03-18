@@ -7,12 +7,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/SecuriWiser/nuclei/v2/pkg/model"
-	"github.com/SecuriWiser/nuclei/v2/pkg/model/types/severity"
-	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/contextargs"
-	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/generators"
-	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/interactsh"
-	"github.com/SecuriWiser/nuclei/v2/pkg/testutils"
+	"github.com/projectdiscovery/nuclei/v2/pkg/model"
+	"github.com/projectdiscovery/nuclei/v2/pkg/model/types/severity"
+	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/contextargs"
+	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/generators"
+	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/interactsh"
+	"github.com/projectdiscovery/nuclei/v2/pkg/testutils"
 )
 
 func TestMakeRequestFromModal(t *testing.T) {

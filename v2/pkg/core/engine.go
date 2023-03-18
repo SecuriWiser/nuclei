@@ -1,10 +1,10 @@
 package core
 
 import (
-	"github.com/SecuriWiser/nuclei/v2/pkg/output"
-	"github.com/SecuriWiser/nuclei/v2/pkg/protocols"
-	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/contextargs"
-	"github.com/SecuriWiser/nuclei/v2/pkg/types"
+	"github.com/projectdiscovery/nuclei/v2/pkg/output"
+	"github.com/projectdiscovery/nuclei/v2/pkg/protocols"
+	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/contextargs"
+	"github.com/projectdiscovery/nuclei/v2/pkg/types"
 )
 
 // Engine is an executer for running Nuclei Templates/Workflows.

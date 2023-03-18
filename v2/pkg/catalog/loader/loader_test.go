@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/SecuriWiser/nuclei/v2/pkg/catalog/disk"
+	"github.com/projectdiscovery/nuclei/v2/pkg/catalog/disk"
 	"github.com/stretchr/testify/require"
 )
 

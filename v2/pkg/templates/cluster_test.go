@@ -3,8 +3,8 @@ package templates
 import (
 	"testing"
 
-	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/dns"
-	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/http"
+	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/dns"
+	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/http"
 	"github.com/stretchr/testify/require"
 )
 

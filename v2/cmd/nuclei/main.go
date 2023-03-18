@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/SecuriWiser/nuclei/v2/internal/firebase"
-	"github.com/SecuriWiser/nuclei/v2/internal/mongo"
-	"github.com/SecuriWiser/nuclei/v2/internal/scanner"
 	"github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/nuclei/v2/internal/firebase"
+	"github.com/projectdiscovery/nuclei/v2/internal/mongo"
+	"github.com/projectdiscovery/nuclei/v2/internal/scanner"
 	"os"
 	"os/signal"
 )

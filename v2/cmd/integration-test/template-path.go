@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SecuriWiser/nuclei/v2/pkg/testutils"
-	"github.com/SecuriWiser/nuclei/v2/pkg/utils"
+	"github.com/projectdiscovery/nuclei/v2/pkg/testutils"
+	"github.com/projectdiscovery/nuclei/v2/pkg/utils"
 )
 
 func getTemplatePath() string {

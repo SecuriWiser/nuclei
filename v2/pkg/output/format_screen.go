@@ -3,12 +3,12 @@ package output
 import (
 	"bytes"
 	"context"
-	"github.com/SecuriWiser/nuclei/v2/internal/firebase"
 	"github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/nuclei/v2/internal/firebase"
 	"strconv"
 	"strings"
 
-	"github.com/SecuriWiser/nuclei/v2/pkg/types"
+	"github.com/projectdiscovery/nuclei/v2/pkg/types"
 )
 
 // formatScreen formats the output for showing on screen.

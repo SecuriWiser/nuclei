@@ -5,14 +5,14 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/SecuriWiser/nuclei/v2/pkg/model"
-	"github.com/SecuriWiser/nuclei/v2/pkg/operators"
-	"github.com/SecuriWiser/nuclei/v2/pkg/output"
-	"github.com/SecuriWiser/nuclei/v2/pkg/protocols"
-	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/contextargs"
-	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/helpers/writer"
-	"github.com/SecuriWiser/nuclei/v2/pkg/templates/types"
 	"github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/nuclei/v2/pkg/model"
+	"github.com/projectdiscovery/nuclei/v2/pkg/operators"
+	"github.com/projectdiscovery/nuclei/v2/pkg/output"
+	"github.com/projectdiscovery/nuclei/v2/pkg/protocols"
+	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/contextargs"
+	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/helpers/writer"
+	"github.com/projectdiscovery/nuclei/v2/pkg/templates/types"
 	cryptoutil "github.com/projectdiscovery/utils/crypto"
 )
 

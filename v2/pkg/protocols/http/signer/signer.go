@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/SecuriWiser/nuclei/v2/pkg/types"
+	"github.com/projectdiscovery/nuclei/v2/pkg/types"
 )
 
 // An Argument that can be passed to Signer

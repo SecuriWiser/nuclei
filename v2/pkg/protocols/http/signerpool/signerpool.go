@@ -5,9 +5,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/http/signer"
+	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/http/signer"
 
-	"github.com/SecuriWiser/nuclei/v2/pkg/types"
+	"github.com/projectdiscovery/nuclei/v2/pkg/types"
 )
 
 var (

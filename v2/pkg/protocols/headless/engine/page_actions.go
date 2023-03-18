@@ -10,12 +10,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SecuriWiser/nuclei/v2/pkg/protocols/common/generators"
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/input"
 	"github.com/go-rod/rod/lib/proto"
 	"github.com/go-rod/rod/lib/utils"
 	"github.com/pkg/errors"
+	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/generators"
 	"github.com/segmentio/ksuid"
 )
 

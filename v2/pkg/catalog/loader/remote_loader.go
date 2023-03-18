@@ -9,7 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/SecuriWiser/nuclei/v2/pkg/utils"
+	"github.com/projectdiscovery/nuclei/v2/pkg/utils"
 )
 
 type ContentType string

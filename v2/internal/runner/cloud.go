@@ -9,12 +9,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/SecuriWiser/nuclei/v2/internal/runner/nucleicloud"
-	"github.com/SecuriWiser/nuclei/v2/pkg/output"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/olekukonko/tablewriter"
 	"github.com/pkg/errors"
 	"github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/nuclei/v2/internal/runner/nucleicloud"
+	"github.com/projectdiscovery/nuclei/v2/pkg/output"
 )
 
 // Get all the scan lists for a user/apikey.
