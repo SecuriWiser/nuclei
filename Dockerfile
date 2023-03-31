@@ -4,7 +4,6 @@ RUN apk add build-base
 WORKDIR /app
 COPY . /app
 WORKDIR /app/v2
-RUN go mod download
 RUN go build ./cmd/nuclei
 
 # Release
