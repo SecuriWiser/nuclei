@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/projectdiscovery/nuclei/v2/internal/firebase"
 	"github.com/projectdiscovery/nuclei/v2/internal/kafka"
+	"github.com/projectdiscovery/nuclei/v2/pkg/utils"
 	"io"
 	"os"
 	"path/filepath"
@@ -30,6 +32,11 @@ import (
 	fileutil "github.com/projectdiscovery/utils/file"
 )
 
+func markAsDone(riskID string) {
+	coll := firebase.Client.Collection("scanning_dev").Doc("risk-profiles").Collection(riskID)
+	_, _, _ = coll.Add(context.Background(), map[string]bool{"done": true})
+}
+
 func WaitForScanning() {
 	gologger.Info().Msg("Waiting for scanning....\n")
 	ctx := context.Background()
@@ -49,6 +56,10 @@ func WaitForScanning() {
 
 func startScanning(url string, riskID string) {
 	gologger.Info().Msgf("Start scanning for %s\n", url)
+	oneHour := 3600 * 1000
+	go utils.SetTimeout(func() {
+		markAsDone(riskID)
+	}, oneHour)
 	var (
 		cfgFile    string
 		memProfile string // optional profile file path
@@ -101,11 +112,7 @@ func startScanning(url string, riskID string) {
 		return
 	}
 
-	// Setup graceful exits
 	resumeFileName := types.DefaultResumeFilePath()
-	//c := make(chan os.Signal, 1)
-	//defer close(c)
-	//signal.Notify(c, os.Interrupt)
 
 	if err := nucleiRunner.RunEnumeration(); err != nil {
 		if options.Validate {
@@ -115,10 +122,14 @@ func startScanning(url string, riskID string) {
 		}
 	}
 	nucleiRunner.Close()
+	markAsDone(riskID)
 	gologger.Info().Msgf("Done scanning for %s\n", url)
 	// on successful execution remove the resume file in case it exists
 	if fileutil.FileExists(resumeFileName) {
-		os.Remove(resumeFileName)
+		err := os.Remove(resumeFileName)
+		if err != nil {
+			gologger.Error().Msgf("Error removing file: %v", err)
+		}
 	}
 }
 

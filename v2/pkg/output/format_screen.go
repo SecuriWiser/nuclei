@@ -117,7 +117,8 @@ func (w *StandardWriter) formatScreen(output *ResultEvent, riskID string) []byte
 	builder.WriteRune(']')
 	riskData["description"] = output.Info.Description
 
-	_, _, err := firebase.Client.Collection("scanning_dev").Doc("risk-profiles").Collection(riskID).Add(context.Background(), riskData)
+	coll := firebase.Client.Collection("scanning_dev").Doc("risk-profiles").Collection(riskID)
+	_, _, err := coll.Add(context.Background(), riskData)
 	if err != nil {
 		gologger.Error().Msgf("Add data for %s to firebase error %s\n", riskID, err.Error())
 	}
