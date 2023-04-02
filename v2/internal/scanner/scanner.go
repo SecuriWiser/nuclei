@@ -1,12 +1,15 @@
 package scanner
 
 import (
+	"cloud.google.com/go/firestore"
 	"context"
 	"errors"
 	"fmt"
 	"github.com/projectdiscovery/nuclei/v2/internal/firebase"
 	"github.com/projectdiscovery/nuclei/v2/internal/kafka"
 	"github.com/projectdiscovery/nuclei/v2/pkg/utils"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"io"
 	"os"
 	"path/filepath"
@@ -32,9 +35,22 @@ import (
 	fileutil "github.com/projectdiscovery/utils/file"
 )
 
-func markAsDone(riskID string) {
+func markAsDone(ctx context.Context, riskID string) error {
 	coll := firebase.Client.Collection("scanning_dev").Doc("risk-profiles").Collection(riskID)
-	_, _, _ = coll.Add(context.Background(), map[string]bool{"done": true})
+	doc := coll.Doc("status")
+	_, err := doc.Set(ctx, map[string]any{"done": true}, firestore.MergeAll)
+	if err != nil {
+		// If the document doesn't exist, create it with the new field
+		if status_, ok := status.FromError(err); ok && status_.Code() == codes.NotFound {
+			_, err = doc.Set(ctx, map[string]interface{}{
+				"done": true,
+			})
+			return err
+		} else {
+			return err
+		}
+	}
+	return nil
 }
 
 func WaitForScanning() {
@@ -56,10 +72,13 @@ func WaitForScanning() {
 
 func startScanning(url string, riskID string) {
 	gologger.Info().Msgf("Start scanning for %s\n", url)
-	oneHour := 3600 * 1000
+	thirtyMins := 1800 * 1000
 	go utils.SetTimeout(func() {
-		markAsDone(riskID)
-	}, oneHour)
+		err := markAsDone(context.Background(), riskID)
+		if err != nil {
+			gologger.Error().Msgf("Error markAsDone: %v", err)
+		}
+	}, thirtyMins)
 	var (
 		cfgFile    string
 		memProfile string // optional profile file path
@@ -89,7 +108,10 @@ func startScanning(url string, riskID string) {
 
 		defer func() {
 			_ = pprof.Lookup("heap").WriteTo(f, 0)
-			f.Close()
+			err := f.Close()
+			if err != nil {
+				gologger.Error().Msgf("Error closing file: %v", err)
+			}
 			runtime.MemProfileRate = old
 			gologger.Print().Msgf("profile: memory profiling disabled, %s", memProfile)
 		}()
@@ -122,7 +144,10 @@ func startScanning(url string, riskID string) {
 		}
 	}
 	nucleiRunner.Close()
-	markAsDone(riskID)
+	err = markAsDone(context.Background(), riskID)
+	if err != nil {
+		gologger.Error().Msgf("Error markAsDone: %v", err)
+	}
 	gologger.Info().Msgf("Done scanning for %s\n", url)
 	// on successful execution remove the resume file in case it exists
 	if fileutil.FileExists(resumeFileName) {
@@ -271,7 +296,7 @@ on extensive configurability, massive extensibility and ease of use.`)
 			"host-spray":     goflags.EnumVariable(1),
 			"template-spray": goflags.EnumVariable(2),
 		}),
-		flagSet.DurationVarP(&options.InputReadTimeout, "input-read-timeout", "irt", time.Duration(3*time.Minute), "timeout on input read"),
+		flagSet.DurationVarP(&options.InputReadTimeout, "input-read-timeout", "irt", 3*time.Minute, "timeout on input read"),
 		flagSet.BoolVarP(&options.DisableHTTPProbe, "no-httpx", "nh", false, "disable httpx probing for non-url input"),
 		flagSet.BoolVar(&options.DisableStdin, "no-stdin", false, "disable stdin processing"),
 	)
