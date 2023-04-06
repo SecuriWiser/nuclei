@@ -7,7 +7,6 @@ import (
 	"github.com/segmentio/kafka-go"
 	"github.com/segmentio/kafka-go/sasl/scram"
 	"log"
-	"os"
 	"strconv"
 	"time"
 )
@@ -15,12 +14,19 @@ import (
 const ScanningTopic = "start-scanning"
 const Group = "scanning"
 
+const kafkaBroker = ""
+const kafkaUsername = ""
+const kafkaPassword = ""
+
+//var kafkaBroker = os.Getenv("KAFKA_BROKER")
+//var kafkaUsername = os.Getenv("KAFKA_USERNAME")
+//var kafkaPassword = os.Getenv("KAFKA_PASSWORD")
+
 func Produce(ctx context.Context, kafkaDialer *kafka.Dialer) {
 	// initialize a counter
 	i := 0
 
 	// initialize the writer with the broker addresses, and the topic
-	kafkaBroker := os.Getenv("KAFKA_BROKER")
 	w := kafka.NewWriter(kafka.WriterConfig{
 		Brokers: []string{kafkaBroker},
 		Topic:   ScanningTopic,
@@ -53,7 +59,6 @@ func GetReader() *kafka.Reader {
 	// the groupID identifies the consumer and prevents
 	// it from receiving duplicate messages
 	dialer := GetDialer()
-	kafkaBroker := os.Getenv("KAFKA_BROKER")
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers: []string{kafkaBroker},
 		GroupID: Group,
@@ -75,8 +80,6 @@ func GetReader() *kafka.Reader {
 
 func GetDialer() *kafka.Dialer {
 	// get kafka reader using environment variables.
-	kafkaUsername := os.Getenv("KAFKA_USERNAME")
-	kafkaPassword := os.Getenv("KAFKA_PASSWORD")
 	mechanism, err := scram.Mechanism(
 		scram.SHA256,
 		kafkaUsername,

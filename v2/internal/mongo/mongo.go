@@ -3,18 +3,18 @@ package mongo
 import (
 	"context"
 	"github.com/projectdiscovery/gologger"
-	"os"
-
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var Client *mongo.Client
+var uri = ""
+
+//var uri = os.Getenv("MONGO_URI")
 
 func Connect() {
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	uri := os.Getenv("MONGO_URI")
 	opts := options.Client().ApplyURI(uri).SetServerAPIOptions(serverAPI)
 
 	// Create a new client and connect to the server

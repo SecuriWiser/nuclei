@@ -54,6 +54,7 @@ func markAsDone(ctx context.Context, riskID string) error {
 }
 
 func WaitForScanning() {
+	//startScanning("younoodle.com", "testid1")
 	gologger.Info().Msg("Waiting for scanning....\n")
 	ctx := context.Background()
 
@@ -179,7 +180,7 @@ on extensive configurability, massive extensibility and ease of use.`)
 		flagSet.BoolVarP(&options.NewTemplates, "new-templates", "nt", false, "run only new templates added in latest nuclei-templates release"),
 		flagSet.StringSliceVarP(&options.NewTemplatesWithVersion, "new-templates-version", "ntv", nil, "run new templates added in specific version", goflags.CommaSeparatedStringSliceOptions),
 		flagSet.BoolVarP(&options.AutomaticScan, "automatic-scan", "as", false, "automatic web scan using wappalyzer technology detection to tags mapping"),
-		flagSet.StringSliceVarP(&options.Templates, "templates", "t", nil, "list of template or template directory to run (comma-separated, file)", goflags.FileCommaSeparatedStringSliceOptions),
+		flagSet.StringSliceVarP(&options.Templates, "templates", "t", []string{"vulnerabilities", "ssl", "cves", "exposures", "technologies", "dns"}, "list of template or template directory to run (comma-separated, file)", goflags.FileCommaSeparatedStringSliceOptions),
 		flagSet.StringSliceVarP(&options.TemplateURLs, "template-url", "tu", nil, "list of template urls to run (comma-separated, file)", goflags.FileCommaSeparatedStringSliceOptions),
 		flagSet.StringSliceVarP(&options.Workflows, "workflows", "w", nil, "list of workflow or workflow directory to run (comma-separated, file)", goflags.FileCommaSeparatedStringSliceOptions),
 		flagSet.StringSliceVarP(&options.WorkflowURLs, "workflow-url", "wu", nil, "list of workflow urls to run (comma-separated, file)", goflags.FileCommaSeparatedStringSliceOptions),
@@ -273,7 +274,7 @@ on extensive configurability, massive extensibility and ease of use.`)
 	)
 
 	flagSet.CreateGroup("rate-limit", "Rate-Limit",
-		flagSet.IntVarP(&options.RateLimit, "rate-limit", "rl", 20, "maximum number of requests to send per second"),
+		flagSet.IntVarP(&options.RateLimit, "rate-limit", "rl", 50, "maximum number of requests to send per second"),
 		flagSet.IntVarP(&options.RateLimitMinute, "rate-limit-minute", "rlm", 0, "maximum number of requests to send per minute"),
 		flagSet.IntVarP(&options.BulkSize, "bulk-size", "bs", 25, "maximum number of hosts to be analyzed in parallel per template"),
 		flagSet.IntVarP(&options.TemplateThreads, "concurrency", "c", 25, "maximum number of templates to be executed in parallel"),
@@ -282,8 +283,8 @@ on extensive configurability, massive extensibility and ease of use.`)
 	)
 
 	flagSet.CreateGroup("optimization", "Optimizations",
-		flagSet.IntVar(&options.Timeout, "timeout", 10, "time to wait in seconds before timeout"),
-		flagSet.IntVar(&options.Retries, "retries", 1, "number of times to retry a failed request"),
+		flagSet.IntVar(&options.Timeout, "timeout", 20, "time to wait in seconds before timeout"),
+		flagSet.IntVar(&options.Retries, "retries", 2, "number of times to retry a failed request"),
 		flagSet.BoolVarP(&options.LeaveDefaultPorts, "leave-default-ports", "ldp", false, "leave default HTTP/HTTPS ports (eg. host:80,host:443)"),
 		flagSet.IntVarP(&options.MaxHostError, "max-host-error", "mhe", 30, "max errors for a host before skipping from scan"),
 		flagSet.BoolVarP(&options.NoHostErrors, "no-mhe", "nmhe", false, "disable skipping host from scan based on errors"),
