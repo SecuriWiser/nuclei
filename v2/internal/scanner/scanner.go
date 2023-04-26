@@ -6,8 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/projectdiscovery/nuclei/v2/internal/firebase"
-	"github.com/projectdiscovery/nuclei/v2/internal/kafka"
 	"github.com/projectdiscovery/nuclei/v2/pkg/utils"
+	"github.com/projectdiscovery/nuclei/v2/pkg/utils/monitor"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"io"
@@ -15,7 +15,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"runtime/pprof"
-	"strings"
 	"time"
 
 	"github.com/projectdiscovery/goflags"
@@ -30,7 +29,6 @@ import (
 	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/http"
 	templateTypes "github.com/projectdiscovery/nuclei/v2/pkg/templates/types"
 	"github.com/projectdiscovery/nuclei/v2/pkg/types"
-	"github.com/projectdiscovery/nuclei/v2/pkg/utils/monitor"
 	errorutil "github.com/projectdiscovery/utils/errors"
 	fileutil "github.com/projectdiscovery/utils/file"
 )
@@ -53,25 +51,7 @@ func markAsDone(ctx context.Context, riskID string) error {
 	return nil
 }
 
-func WaitForScanning() {
-	//startScanning("younoodle.com", "testid1")
-	gologger.Info().Msg("Waiting for scanning....\n")
-	ctx := context.Background()
-
-	r := kafka.GetReader()
-	for {
-		msg, err := r.ReadMessage(ctx)
-		if err != nil {
-			panic("could not read message " + err.Error())
-		}
-		risk, url := string(msg.Key), string(msg.Value)
-		if strings.Contains(risk, "scanning-") {
-			go startScanning(url, risk)
-		}
-	}
-}
-
-func startScanning(url string, riskID string) {
+func StartScanning(url string, riskID string) {
 	gologger.Info().Msgf("Start scanning for %s\n", url)
 	thirtyMins := 1800 * 1000
 	go utils.SetTimeout(func() {
@@ -180,7 +160,7 @@ on extensive configurability, massive extensibility and ease of use.`)
 		flagSet.BoolVarP(&options.NewTemplates, "new-templates", "nt", false, "run only new templates added in latest nuclei-templates release"),
 		flagSet.StringSliceVarP(&options.NewTemplatesWithVersion, "new-templates-version", "ntv", nil, "run new templates added in specific version", goflags.CommaSeparatedStringSliceOptions),
 		flagSet.BoolVarP(&options.AutomaticScan, "automatic-scan", "as", false, "automatic web scan using wappalyzer technology detection to tags mapping"),
-		flagSet.StringSliceVarP(&options.Templates, "templates", "t", []string{"vulnerabilities", "ssl", "cves", "exposures", "technologies", "dns"}, "list of template or template directory to run (comma-separated, file)", goflags.FileCommaSeparatedStringSliceOptions),
+		flagSet.StringSliceVarP(&options.Templates, "templates", "t", nil, "list of template or template directory to run (comma-separated, file)", goflags.FileCommaSeparatedStringSliceOptions),
 		flagSet.StringSliceVarP(&options.TemplateURLs, "template-url", "tu", nil, "list of template urls to run (comma-separated, file)", goflags.FileCommaSeparatedStringSliceOptions),
 		flagSet.StringSliceVarP(&options.Workflows, "workflows", "w", nil, "list of workflow or workflow directory to run (comma-separated, file)", goflags.FileCommaSeparatedStringSliceOptions),
 		flagSet.StringSliceVarP(&options.WorkflowURLs, "workflow-url", "wu", nil, "list of workflow urls to run (comma-separated, file)", goflags.FileCommaSeparatedStringSliceOptions),
