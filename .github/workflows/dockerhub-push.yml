@@ -31,6 +31,16 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
+      - name: Create and populate serviceAccount.json
+        env:
+          SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+        run: |
+          touch v2/internal/firebase/serviceAccount.json
+          echo $SERVICE_ACCOUNT >> v2/internal/firebase/serviceAccount.json
+          echo "cat serviceAccount.json"
+          cat v2/internal/firebase/serviceAccount.json
+        shell: bash
+
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
