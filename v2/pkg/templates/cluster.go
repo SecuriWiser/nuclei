@@ -113,7 +113,7 @@ func ClusterID(templates []*Template) string {
 	return cryptoutil.SHA256Sum(ids)
 }
 
-func ClusterTemplates(templatesList []*Template, options protocols.ExecuterOptions, riskID string) ([]*Template, int) {
+func ClusterTemplates(templatesList []*Template, options protocols.ExecuterOptions) ([]*Template, int) {
 	if options.Options.OfflineHTTP || options.Options.DisableClustering {
 		return templatesList, 0
 	}
@@ -146,7 +146,7 @@ func ClusterTemplates(templatesList []*Template, options protocols.ExecuterOptio
 				RequestsDNS:   cluster[0].RequestsDNS,
 				RequestsHTTP:  cluster[0].RequestsHTTP,
 				RequestsSSL:   cluster[0].RequestsSSL,
-				Executer:      NewClusterExecuter(cluster, &executerOpts, riskID),
+				Executer:      NewClusterExecuter(cluster, &executerOpts),
 				TotalRequests: len(cluster[0].RequestsHTTP) + len(cluster[0].RequestsDNS),
 			})
 			clusterCount += len(cluster)
@@ -165,7 +165,6 @@ type ClusterExecuter struct {
 	operators    []*clusteredOperator
 	templateType types.ProtocolType
 	options      *protocols.ExecuterOptions
-	riskID       string
 }
 
 type clusteredOperator struct {
@@ -178,8 +177,8 @@ type clusteredOperator struct {
 var _ protocols.Executer = &ClusterExecuter{}
 
 // NewClusterExecuter creates a new request executer for list of requests
-func NewClusterExecuter(requests []*Template, options *protocols.ExecuterOptions, riskID string) *ClusterExecuter {
-	executer := &ClusterExecuter{options: options, riskID: riskID}
+func NewClusterExecuter(requests []*Template, options *protocols.ExecuterOptions) *ClusterExecuter {
+	executer := &ClusterExecuter{options: options}
 	if len(requests[0].RequestsDNS) == 1 {
 		executer.templateType = types.DNSProtocol
 		executer.requests = requests[0].RequestsDNS[0]
@@ -261,7 +260,7 @@ func (e *ClusterExecuter) Execute(input *contextargs.Context) (bool, error) {
 				event.Results = e.requests.MakeResultEvent(event)
 				results = true
 
-				_ = writer.WriteResult(event, e.options.Output, e.options.Progress, e.options.IssuesClient, e.riskID)
+				_ = writer.WriteResult(event, e.options.Output, e.options.Progress, e.options.IssuesClient)
 			}
 		}
 	})

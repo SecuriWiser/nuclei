@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/apex/log"
 	"github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/nuclei/v2/config"
 	"github.com/projectdiscovery/nuclei/v2/internal/firebase"
 	"github.com/projectdiscovery/nuclei/v2/internal/scanner"
 	"os"
@@ -27,10 +28,8 @@ func main() {
 	defer close(c)
 	waitForShutdown(c)
 
-	url := os.Getenv("URL")
-	riskID := os.Getenv("RISK_ID")
-	if url != "" && riskID != "" {
-		scanner.StartScanning(url, riskID)
+	if config.Url != "" && config.RiskID != "" {
+		scanner.StartScanning()
 	} else {
 		log.Info("Url or riskID is empty")
 	}

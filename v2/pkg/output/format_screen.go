@@ -4,15 +4,17 @@ import (
 	"bytes"
 	"context"
 	"github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/nuclei/v2/config"
 	"github.com/projectdiscovery/nuclei/v2/internal/firebase"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/projectdiscovery/nuclei/v2/pkg/types"
 )
 
 // formatScreen formats the output for showing on screen.
-func (w *StandardWriter) formatScreen(output *ResultEvent, riskID string) []byte {
+func (w *StandardWriter) formatScreen(output *ResultEvent) []byte {
 	builder := &bytes.Buffer{}
 	riskData := make(map[string]any)
 
@@ -116,11 +118,12 @@ func (w *StandardWriter) formatScreen(output *ResultEvent, riskID string) []byte
 	builder.WriteString(strings.Replace(output.Info.Description, "\n", "", 1))
 	builder.WriteRune(']')
 	riskData["description"] = output.Info.Description
+	riskData["time"] = time.Now().String()
 
-	coll := firebase.Client.Collection("scanning_dev").Doc("risk-profiles").Collection(riskID)
+	coll := firebase.Client.Collection("scanning_dev").Doc("risk-profiles").Collection(config.RiskID)
 	_, _, err := coll.Add(context.Background(), riskData)
 	if err != nil {
-		gologger.Error().Msgf("Add data for %s to firebase error %s\n", riskID, err.Error())
+		gologger.Error().Msgf("Add data for %s to firebase error %s\n", config.RiskID, err.Error())
 	}
 
 	return builder.Bytes()

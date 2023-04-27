@@ -36,7 +36,7 @@ func (e *Engine) ExecuteScanWithOpts(templatesList []*templates.Template, target
 
 	var finalTemplates []*templates.Template
 	if !noCluster {
-		finalTemplates, _ = templates.ClusterTemplates(templatesList, e.executerOpts, e.executerOpts.Options.RiskID)
+		finalTemplates, _ = templates.ClusterTemplates(templatesList, e.executerOpts)
 	} else {
 		finalTemplates = templatesList
 	}

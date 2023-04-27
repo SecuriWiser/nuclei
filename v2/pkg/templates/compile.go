@@ -146,7 +146,7 @@ func (template *Template) compileProtocolRequests(options protocols.ExecuterOpti
 	if len(template.RequestsWHOIS) > 0 {
 		requests = append(requests, template.convertRequestToProtocolsRequest(template.RequestsWHOIS)...)
 	}
-	template.Executer = executer.NewExecuter(requests, &options, options.Options.RiskID)
+	template.Executer = executer.NewExecuter(requests, &options)
 	return nil
 }
 
@@ -191,7 +191,7 @@ mainLoop:
 	}
 	if len(operatorsList) > 0 {
 		options.Operators = operatorsList
-		template.Executer = executer.NewExecuter([]protocols.Request{&offlinehttp.Request{}}, &options, "compileOfflineHTTPRequest")
+		template.Executer = executer.NewExecuter([]protocols.Request{&offlinehttp.Request{}}, &options)
 		return nil
 	}
 

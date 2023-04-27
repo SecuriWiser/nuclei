@@ -190,7 +190,7 @@ func (r *Runner) deleteScan(id string) error {
 func (r *Runner) getResults(id string, limit int) error {
 	ID, _ := strconv.ParseInt(id, 10, 64)
 	err := r.cloudClient.GetResults(ID, false, limit, func(re *output.ResultEvent) {
-		if outputErr := r.output.Write(re, r.options.RiskID); outputErr != nil {
+		if outputErr := r.output.Write(re); outputErr != nil {
 			gologger.Warning().Msgf("Could not write output: %s", outputErr)
 		}
 	})

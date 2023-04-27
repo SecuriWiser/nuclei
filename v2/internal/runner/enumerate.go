@@ -117,7 +117,7 @@ func (r *Runner) runCloudEnumeration(store *loader.Store, cloudTemplates, cloudT
 		results.CompareAndSwap(false, true)
 		_ = count.Add(1)
 
-		if outputErr := r.output.Write(re, r.options.RiskID); outputErr != nil {
+		if outputErr := r.output.Write(re); outputErr != nil {
 			gologger.Warning().Msgf("Could not write output: %s", err)
 		}
 		if r.issuesClient != nil {

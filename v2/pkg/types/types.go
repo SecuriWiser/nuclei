@@ -350,7 +350,6 @@ type Options struct {
 	FuzzingType string
 	// Fuzzing Mode overrides template level fuzzing-mode configuration
 	FuzzingMode string
-	RiskID      string
 }
 
 // ShouldLoadResume resume file

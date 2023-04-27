@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	config2 "github.com/projectdiscovery/nuclei/v2/config"
 	"github.com/projectdiscovery/nuclei/v2/internal/firebase"
 	"github.com/projectdiscovery/nuclei/v2/pkg/utils"
 	"github.com/projectdiscovery/nuclei/v2/pkg/utils/monitor"
@@ -33,8 +34,8 @@ import (
 	fileutil "github.com/projectdiscovery/utils/file"
 )
 
-func markAsDone(ctx context.Context, riskID string) error {
-	coll := firebase.Client.Collection("scanning_dev").Doc("risk-profiles").Collection(riskID)
+func markAsDone(ctx context.Context) error {
+	coll := firebase.Client.Collection("scanning_dev").Doc("risk-profiles").Collection(config2.RiskID)
 	doc := coll.Doc("status")
 	_, err := doc.Set(ctx, map[string]any{"done": true}, firestore.MergeAll)
 	if err != nil {
@@ -51,11 +52,11 @@ func markAsDone(ctx context.Context, riskID string) error {
 	return nil
 }
 
-func StartScanning(url string, riskID string) {
-	gologger.Info().Msgf("Start scanning for %s\n", url)
+func StartScanning() {
+	gologger.Info().Msgf("Start scanning for %s\n", config2.Url)
 	thirtyMins := 1800 * 1000
 	go utils.SetTimeout(func() {
-		err := markAsDone(context.Background(), riskID)
+		err := markAsDone(context.Background())
 		if err != nil {
 			gologger.Error().Msgf("Error markAsDone: %v", err)
 		}
@@ -68,7 +69,7 @@ func StartScanning(url string, riskID string) {
 	if err := runner.ConfigureOptions(); err != nil {
 		gologger.Fatal().Msgf("Could not initialize options: %s\n", err)
 	}
-	flagSet := readConfig(options, &cfgFile, &memProfile, url)
+	flagSet := readConfig(options, &cfgFile, &memProfile, config2.Url)
 	configPath, _ := flagSet.GetConfigFilePath()
 
 	if options.ListDslSignatures {
@@ -98,7 +99,6 @@ func StartScanning(url string, riskID string) {
 		}()
 	}
 
-	options.RiskID = riskID
 	runner.ParseOptions(options)
 	options.ConfigPath = configPath
 
@@ -125,11 +125,11 @@ func StartScanning(url string, riskID string) {
 		}
 	}
 	nucleiRunner.Close()
-	err = markAsDone(context.Background(), riskID)
+	err = markAsDone(context.Background())
 	if err != nil {
 		gologger.Error().Msgf("Error markAsDone: %v", err)
 	}
-	gologger.Info().Msgf("Done scanning for %s\n", url)
+	gologger.Info().Msgf("Done scanning for %s\n", config2.Url)
 	// on successful execution remove the resume file in case it exists
 	if fileutil.FileExists(resumeFileName) {
 		err := os.Remove(resumeFileName)

@@ -33,7 +33,7 @@ type Writer interface {
 	// Colorizer returns the colorizer instance for writer
 	Colorizer() aurora.Aurora
 	// Write writes the event to file and/or screen.
-	Write(*ResultEvent, string) error
+	Write(*ResultEvent) error
 	// WriteFailure writes the optional failure event for template to file and/or screen.
 	WriteFailure(event InternalEvent) error
 	// Request logs a request in the trace log
@@ -198,7 +198,7 @@ func NewStandardWriter(options *types.Options) (*StandardWriter, error) {
 }
 
 // Write writes the event to file and/or screen.
-func (w *StandardWriter) Write(event *ResultEvent, riskID string) error {
+func (w *StandardWriter) Write(event *ResultEvent) error {
 	// Enrich the result event with extra metadata on the template-path and url.
 	if event.TemplatePath != "" {
 		event.Template, event.TemplateURL = utils.TemplatePathURL(types.ToString(event.TemplatePath))
@@ -211,7 +211,7 @@ func (w *StandardWriter) Write(event *ResultEvent, riskID string) error {
 	if w.json {
 		data, err = w.formatJSON(event)
 	} else {
-		data = w.formatScreen(event, riskID)
+		data = w.formatScreen(event)
 	}
 	if err != nil {
 		return errors.Wrap(err, "could not format output")
@@ -313,7 +313,7 @@ func (w *StandardWriter) WriteFailure(event InternalEvent) error {
 		MatcherStatus: false,
 		Timestamp:     time.Now(),
 	}
-	return w.Write(data, "")
+	return w.Write(data)
 }
 func sanitizeFileName(fileName string) string {
 	fileName = strings.ReplaceAll(fileName, "http:", "")

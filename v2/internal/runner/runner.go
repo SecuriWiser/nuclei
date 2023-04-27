@@ -279,7 +279,6 @@ func New(options *types.Options) (*Runner, error) {
 	if httpclient != nil {
 		opts.HTTPClient = httpclient
 	}
-	opts.RiskID = options.RiskID
 	interactshClient, err := interactsh.New(opts)
 	if err != nil {
 		gologger.Error().Msgf("Could not create interactsh client: %s", err)
@@ -632,7 +631,7 @@ func (r *Runner) executeTemplatesInput(store *loader.Store, engine *core.Engine)
 	// Cluster the templates first because we want info on how many
 	// templates did we cluster for showing to user in CLI
 	originalTemplatesCount := len(store.Templates())
-	finalTemplates, clusterCount := templates.ClusterTemplates(store.Templates(), engine.ExecuterOptions(), r.options.RiskID)
+	finalTemplates, clusterCount := templates.ClusterTemplates(store.Templates(), engine.ExecuterOptions())
 	finalTemplates = append(finalTemplates, store.Workflows()...)
 
 	var totalRequests int64
