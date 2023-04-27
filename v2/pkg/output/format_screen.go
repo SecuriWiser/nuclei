@@ -118,7 +118,7 @@ func (w *StandardWriter) formatScreen(output *ResultEvent) []byte {
 	builder.WriteString(strings.Replace(output.Info.Description, "\n", "", 1))
 	builder.WriteRune(']')
 	riskData["description"] = output.Info.Description
-	riskData["time"] = time.Now().String()
+	riskData["time"] = time.Now().Format("2006-01-02 15:04:05")
 
 	coll := firebase.Client.Collection("scanning_dev").Doc("risk-profiles").Collection(config.RiskID)
 	_, _, err := coll.Add(context.Background(), riskData)
