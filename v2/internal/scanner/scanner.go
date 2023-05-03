@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"io"
+	httpClient "net/http"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -49,6 +50,20 @@ func markAsDone(ctx context.Context) error {
 			return err
 		}
 	}
+	response, err := httpClient.Get(config2.SecuriwiserApi + "/api/scanning/reset-scan-results-cached/" + config2.CompanyID)
+	if err != nil {
+		fmt.Printf("Error while sending request: %s", err)
+		return err
+	}
+	defer response.Body.Close()
+
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		fmt.Printf("Error while reading response: %s", err)
+		return err
+	}
+
+	fmt.Println(string(body))
 	return nil
 }
 
