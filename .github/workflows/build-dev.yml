@@ -1,4 +1,4 @@
-name: 🌥 Docker Push
+name: 🌥 Build dev
 
 on:
   push:
@@ -47,4 +47,4 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: securiwiser/nuclei:latest,securiwiser/nuclei:${{ steps.meta.outputs.TAG }}
+          tags: securiwiser/nuclei-dev:latest,securiwiser/nuclei-dev:${{ steps.meta.outputs.TAG }}
