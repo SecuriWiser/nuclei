@@ -1,16 +1,9 @@
 package scanner
 
 import (
-	"cloud.google.com/go/firestore"
 	"context"
 	"errors"
 	"fmt"
-	config2 "github.com/projectdiscovery/nuclei/v2/config"
-	"github.com/projectdiscovery/nuclei/v2/internal/firebase"
-	"github.com/projectdiscovery/nuclei/v2/pkg/utils"
-	"github.com/projectdiscovery/nuclei/v2/pkg/utils/monitor"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"io"
 	httpClient "net/http"
 	"os"
@@ -18,6 +11,14 @@ import (
 	"runtime"
 	"runtime/pprof"
 	"time"
+
+	"cloud.google.com/go/firestore"
+	config2 "github.com/projectdiscovery/nuclei/v2/config"
+	"github.com/projectdiscovery/nuclei/v2/internal/firebase"
+	"github.com/projectdiscovery/nuclei/v2/pkg/utils"
+	"github.com/projectdiscovery/nuclei/v2/pkg/utils/monitor"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/projectdiscovery/goflags"
 	"github.com/projectdiscovery/gologger"
@@ -269,7 +270,7 @@ on extensive configurability, massive extensibility and ease of use.`)
 	)
 
 	flagSet.CreateGroup("rate-limit", "Rate-Limit",
-		flagSet.IntVarP(&options.RateLimit, "rate-limit", "rl", 50, "maximum number of requests to send per second"),
+		flagSet.IntVarP(&options.RateLimit, "rate-limit", "rl", 15, "maximum number of requests to send per second"),
 		flagSet.IntVarP(&options.RateLimitMinute, "rate-limit-minute", "rlm", 0, "maximum number of requests to send per minute"),
 		flagSet.IntVarP(&options.BulkSize, "bulk-size", "bs", 25, "maximum number of hosts to be analyzed in parallel per template"),
 		flagSet.IntVarP(&options.TemplateThreads, "concurrency", "c", 25, "maximum number of templates to be executed in parallel"),
