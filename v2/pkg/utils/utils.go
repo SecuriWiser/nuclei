@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/projectdiscovery/nuclei/v2/pkg/catalog"
 	"github.com/projectdiscovery/nuclei/v2/pkg/catalog/config"
@@ -77,4 +78,9 @@ func StringSliceContains(slice []string, item string) bool {
 		}
 	}
 	return false
+}
+
+func SetTimeout(f func(), milliseconds int) {
+	time.Sleep(time.Duration(milliseconds) * time.Millisecond)
+	f()
 }

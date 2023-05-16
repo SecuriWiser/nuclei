@@ -2,7 +2,10 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"fmt"
+	"io"
+	httpClient "net/http"
 	"os"
 	"os/signal"
 	"runtime"
@@ -10,10 +13,13 @@ import (
 	"strings"
 	"time"
 
+	"cloud.google.com/go/firestore"
 	"github.com/projectdiscovery/goflags"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/gologger/levels"
 	"github.com/projectdiscovery/interactsh/pkg/client"
+	config2 "github.com/projectdiscovery/nuclei/v2/config"
+	"github.com/projectdiscovery/nuclei/v2/internal/firebase"
 	"github.com/projectdiscovery/nuclei/v2/internal/runner"
 	"github.com/projectdiscovery/nuclei/v2/pkg/catalog/config"
 	"github.com/projectdiscovery/nuclei/v2/pkg/model/types/severity"
@@ -23,9 +29,12 @@ import (
 	templateTypes "github.com/projectdiscovery/nuclei/v2/pkg/templates/types"
 	"github.com/projectdiscovery/nuclei/v2/pkg/types"
 	"github.com/projectdiscovery/nuclei/v2/pkg/types/scanstrategy"
+	"github.com/projectdiscovery/nuclei/v2/pkg/utils"
 	"github.com/projectdiscovery/nuclei/v2/pkg/utils/monitor"
 	errorutil "github.com/projectdiscovery/utils/errors"
 	fileutil "github.com/projectdiscovery/utils/file"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var (
@@ -35,6 +44,13 @@ var (
 )
 
 func main() {
+	firebase.Connect()
+	gologger.Info().Msgf("Start scanning for %s\n", config2.Url)
+	thirtyMins := 1800 * 1000
+	go utils.SetTimeout(func() {
+		_ = markAsDone(context.Background())
+	}, thirtyMins)
+
 	if err := runner.ConfigureOptions(); err != nil {
 		gologger.Fatal().Msgf("Could not initialize options: %s\n", err)
 	}
@@ -107,6 +123,8 @@ func main() {
 		}
 	}
 	nucleiRunner.Close()
+	_ = markAsDone(context.Background())
+	gologger.Info().Msgf("Done scanning for %s\n", config2.Url)
 	// on successful execution remove the resume file in case it exists
 	if fileutil.FileExists(resumeFileName) {
 		os.Remove(resumeFileName)
@@ -123,7 +141,7 @@ on extensive configurability, massive extensibility and ease of use.`)
 	*/
 
 	flagSet.CreateGroup("input", "Target",
-		flagSet.StringSliceVarP(&options.Targets, "target", "u", nil, "target URLs/hosts to scan", goflags.StringSliceOptions),
+		flagSet.StringSliceVarP(&options.Targets, "target", "u", []string{config2.Url}, "target URLs/hosts to scan", goflags.StringSliceOptions),
 		flagSet.StringVarP(&options.TargetsFilePath, "list", "l", "", "path to file containing a list of target URLs/hosts to scan (one per line)"),
 		flagSet.StringVar(&options.Resume, "resume", "", "resume scan using resume.cfg (clustering will be disabled)"),
 		flagSet.BoolVarP(&options.ScanAllIPs, "scan-all-ips", "sa", false, "scan all the IP's associated with dns record"),
@@ -474,4 +492,36 @@ func init() {
 	if strings.EqualFold(os.Getenv("DEBUG"), "true") {
 		errorutil.ShowStackTrace = true
 	}
+}
+
+func markAsDone(ctx context.Context) error {
+	coll := firebase.Client.Collection("scanning_dev").Doc("risk-profiles").Collection(config2.RiskID)
+	doc := coll.Doc("status")
+	_, err := doc.Set(ctx, map[string]any{"done": true}, firestore.MergeAll)
+	if err != nil {
+		// If the document doesn't exist, create it with the new field
+		if status_, ok := status.FromError(err); ok && status_.Code() == codes.NotFound {
+			_, err = doc.Set(ctx, map[string]interface{}{
+				"done": true,
+			})
+			return err
+		} else {
+			return err
+		}
+	}
+	response, err := httpClient.Get(config2.SecuriwiserApi + "/api/scanning/reset-scan-results-cached/" + config2.CompanyID)
+	if err != nil {
+		fmt.Printf("Error while sending request: %s", err)
+		return err
+	}
+	defer response.Body.Close()
+
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		fmt.Printf("Error while reading response: %s", err)
+		return err
+	}
+
+	fmt.Println(string(body))
+	return nil
 }
